@@ -1,0 +1,167 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This is cloudformation deployment",
+    "Parameters": {
+        "Subnet1AZ": {
+            "Description": "EnterAZ",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "Subnet2AZ": {
+            "Description": "EnterAZ",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "Subnet3AZ": {
+            "Description": "EnterAZ",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        }
+    },
+    "Resources": {
+        "myvpc": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": "10.10.0.0/16",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FromCF"
+                    }
+                ]
+            }
+        },
+        "mysubnet1": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "Subnet1AZ"
+                },
+                "CidrBlock": "10.10.0.0/24",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FromCF"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "myvpc"
+                }
+            }
+        },
+        "mysubnet2": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "Subnet2AZ"
+                },
+                "CidrBlock": "10.10.1.0/24",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FromCF"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "myvpc"
+                }
+            }
+        },
+        "mysubnet3": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "AvailabilityZone": {
+                    "Ref": "Subnet3AZ"
+                },
+                "CidrBlock": "10.10.2.0/24",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FromCF"
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "myvpc"
+                }
+            }
+        },
+        "myigw": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FromCF"
+                    }
+                ]
+            }
+        },
+        "AttachGateway": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myvpc"
+                },
+                "InternetGatewayId": {
+                    "Ref": "myigw"
+                }
+            }
+        },
+        "myrt": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "myvpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "FromCF"
+                    }
+                ]
+            }
+        },
+        "myroute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "myrt"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "myigw"
+                }
+            }
+        },
+        "rtasub1": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "mysubnet1"
+                },
+                "RouteTableId": {
+                    "Ref": "myrt"
+                }
+            }
+        },
+        "rtasub2": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "mysubnet2"
+                },
+                "RouteTableId": {
+                    "Ref": "myrt"
+                }
+            }
+        },
+        "rtasub3": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "mysubnet3"
+                },
+                "RouteTableId": {
+                    "Ref": "myrt"
+                }
+            }
+        }
+    }
+}
